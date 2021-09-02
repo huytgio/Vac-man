@@ -1,10 +1,13 @@
 import pygame, sys
+from pygame.math import Vector2 as vec
 from setting import *
 from player_class import *
+from enemy_class import *
 
 
 
-Vec = pygame.math.Vector2()
+
+
 pygame.init()
 
 ## Game inittialized
@@ -16,11 +19,15 @@ class App:
         self.state = 'start'
         self.cell_width = MAZE_WIDTH//28
         self.cell_height = MAZE_HEIGHT//32
-        self.player = Player(self,PLAYER_START_POS)
         self.walls = []
-        self.gate = []
+        self.coin = []
+        self.enemy = []
+        self.p_pos = None
+        self.e_pos = []
         
         self.load()
+        self.player = Player(self,self.p_pos)
+        self.make_enemy()
         
         
         
@@ -59,16 +66,32 @@ class App:
                 for xidx,char in enumerate(line):
                     if char == '1':
                        self.walls.append(vec(xidx,yidx))
-        
+                    elif char == 'C':
+                          self.coin.append(vec(xidx,yidx))
+                    elif char == 'P':
+                        self.p_pos= vec(xidx,yidx)
+                    elif char in ['2','3','4','5']:
+                        self.e_pos.append(vec(xidx,yidx))
+    def make_enemy(self):
+        for idx,pos in enumerate(self.e_pos):
+            self.enemy.append(Enemy(self,pos,idx))
        
     def draw_grid(self):
         for x in range(WIDTH//self.cell_width):
             pygame.draw.line(self.background, (255,255,255), (x * self.cell_width,0), (x*self.cell_width,HEIGHT))
         for x in range(HEIGHT//self.cell_height):
             pygame.draw.line(self.background, (255,255,255), (0,x * self.cell_height), (WIDTH,x*self.cell_height))
-        for wall in self.walls:
-            pygame.draw.rect(self.background,(200,200,200),(wall.x * self.cell_width,wall.y * self.cell_height,
-                                                            self.cell_width,self.cell_height))
+        # for wall in self.walls:
+        #     pygame.draw.rect(self.background,(200,200,200),(wall.x * self.cell_width,wall.y * self.cell_height,
+        #                                                     self.cell_width,self.cell_height))
+        # for coin in self.coin:
+        #     pygame.draw.rect(self.background,(170,180,35),(coin.x * self.cell_width,coin.y * self.cell_height,
+        #                                                     self.cell_width,self.cell_height))
+            
+    def draw_coin(self):
+        for coin in self.coin:
+            pygame.draw.circle(self.screen, (80,210,150), (int(coin.x * self.cell_width)+self.cell_width//2+TOP_BOTTOM_BF//2,
+                                                           int(coin.y * self.cell_height)+self.cell_height//2+TOP_BOTTOM_BF//2), 5)
     
 ## Start Function        
     def start_events(self):
@@ -113,16 +136,21 @@ class App:
                 if event.key == pygame.K_DOWN:
                    
                     self.player.move(vec(0,+1))
-                
+        # print(self.coin)
     def playing_update(self):
         self.player.update()
-    
+        for enemy in self.enemy:
+            enemy.update()
     
     def playing_draw(self):
         self.screen.fill((8,23,84))
         self.screen.blit(self.background, (TOP_BOTTOM_BF//2,TOP_BOTTOM_BF//2))
-        # self.draw_grid()
-        self.draw_text([5,2],'SCORE:0',self.screen,START_TEXT_SIZE,(255,255,255),START_FONT)
-        self.draw_text([WIDTH//2+50,2],'HIGHSCORE:',self.screen,START_TEXT_SIZE,(255,255,255),START_FONT)
+        self.draw_coin()
+        self.draw_grid()
+        self.draw_text([5,2],'SCORE:{}'.format(self.player.current_score),self.screen,START_TEXT_SIZE,(255,255,255),START_FONT)
+        self.draw_text([WIDTH//2+50,2],'HIGHSCORE:{}'.format(self.player.highscore),self.screen,START_TEXT_SIZE,(255,255,255),START_FONT)
         self.player.draw()
+        for enemy in self.enemy:
+            enemy.draw()
         pygame.display.update()
+        

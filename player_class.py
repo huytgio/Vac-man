@@ -12,17 +12,23 @@ class Player:
         self.pix_pos = self.get_pix_pos()
         self.stored_direction = None
         self.able_to_move = True
+        self.current_score = 0
+        self.highscore = None
+        self.p_pos = None
+        self.speed = 1
        
         
     def update(self):
-        
+        self.highscore = 0
+        if self.update_highscore():
+            self.highscore = self.current_score
        
         if self.pix_pos == [30,315]:
             self.pix_pos = [570,315]
         if self.pix_pos == [580,315]:
             self.pix_pos = [30,315]
         if self.able_to_move:
-            self.pix_pos += self.direction
+            self.pix_pos += self.direction * self.speed
             
      
         
@@ -34,13 +40,32 @@ class Player:
         
         
                 
-        print(self.grid_pos,self.direction,self.grid_pos + self.direction)
+        # print(self.grid_pos,self.direction,self.grid_pos + self.direction)
        
         
         self.grid_pos[0]= (self.pix_pos[0]-TOP_BOTTOM_BF+self.app.cell_width//2)//self.app.cell_width+1
         
         self.grid_pos[1]= (self.pix_pos[1]-TOP_BOTTOM_BF+self.app.cell_height//2)//self.app.cell_height+1
+        
+        if self.on_coin():
+            self.eat_coin()
+        
+    
+    
+    def on_coin(self):
+        if self.grid_pos in self.app.coin:
+            if int(self.pix_pos.x + TOP_BOTTOM_BF //2) % self.app.cell_width == 0:
+               if self.direction == vec(1,0) or self.direction == vec(-1,0):
+                 return True
+            if int(self.pix_pos.y + TOP_BOTTOM_BF //2) % self.app.cell_height == 0:
+               if self.direction == vec(0,1) or self.direction == vec(0,-1):
+                 return True
+        return False
+     
+    def eat_coin(self):
        
+        self.app.coin.remove(self.grid_pos)
+        self.current_score += 1
     
     
     def draw(self):
@@ -71,6 +96,10 @@ class Player:
             if vec(self.grid_pos + self.direction) == wall:
                 return False
         return True
+    def update_highscore(self):
+        if self.current_score > self.highscore:
+            return True
+        return False
     
     
         
