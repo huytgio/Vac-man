@@ -7,15 +7,16 @@ from pygame.locals import (RLEACCEL)
 class Player:
     def __init__(self,app,pos):
         self.app = app
-        self.grid_pos = pos
+        self.grid_pos = vec(pos[0],pos[1])
         self.direction = vec(1,0)
         self.pix_pos = self.get_pix_pos()
         self.stored_direction = None
         self.able_to_move = True
         self.current_score = 0
         self.highscore = None
-        self.p_pos = None
+        self.p_pos = [pos.x, pos.y]
         self.speed = 1
+        self.lives = 1
        
         
     def update(self):
@@ -73,22 +74,23 @@ class Player:
        # py.draw.rect(self.app.screen, (255,0,0), (self.grid_pos.x*self.app.cell_width+TOP_BOTTOM_BF//2,
        #                                           self.grid_pos.y*self.app.cell_height+TOP_BOTTOM_BF//2,
        #                                           self.app.cell_width,self.app.cell_height),1,)
-    
+       for x in range(self.lives):
+           py.draw.circle(self.app.screen,PLAYER_COL, (100 + x * 20,HEIGHT-12), self.app.cell_width//2)
     
     def move(self, direction):
         self.stored_direction = direction
     
     
     def get_pix_pos(self):
-        return vec((self.grid_pos.x * self.app.cell_width)+TOP_BOTTOM_BF//2 + self.app.cell_width//2
-                            , (self.grid_pos.y * self.app.cell_height)+TOP_BOTTOM_BF//2 + self.app.cell_height//2)
+        return vec((self.grid_pos[0] * self.app.cell_width)+TOP_BOTTOM_BF//2 + self.app.cell_width//2
+                            , (self.grid_pos[1] * self.app.cell_height)+TOP_BOTTOM_BF//2 + self.app.cell_height//2)
     
     def time_to_move(self):
         if int(self.pix_pos.x + TOP_BOTTOM_BF //2) % self.app.cell_width == 0:
-            if self.direction == vec(1,0) or self.direction == vec(-1,0):
+            if self.direction == vec(1,0) or self.direction == vec(-1,0) or self.direction == vec(0,0):
                 return True
         if int(self.pix_pos.y + TOP_BOTTOM_BF //2) % self.app.cell_height == 0:
-            if self.direction == vec(0,1) or self.direction == vec(0,-1):
+            if self.direction == vec(0,1) or self.direction == vec(0,-1) or self.direction == vec(0,0):
                 return True
             
     def can_move(self):
