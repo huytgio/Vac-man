@@ -46,6 +46,10 @@ class App:
                 self.game_over_events()
                 self.game_over_update()
                 self.game_over_draw()
+            elif self.state == 'win':
+                self.win_events()
+                self.win_update()
+                self.win_draw()
             else:
                 self.running = False
             self.clock.tick(FPS)
@@ -103,12 +107,12 @@ class App:
             enemy.grid_pos = vec(enemy.p_pos)
             enemy.pix_pos = enemy.get_pix_pos()
             enemy.direct *= 0
-        self.coins = []
-        with open("walls.txt", 'r') as file:
+        self.coin = []
+        with open("wall.txt", 'r') as file:
             for yidx, line in enumerate(file):
                 for xidx, char in enumerate(line):
                     if char == 'C':
-                        self.coins.append(vec(xidx, yidx))
+                        self.coin.append(vec(xidx, yidx))
 
         
         self.state = "playing"
@@ -167,6 +171,8 @@ class App:
         for enemy in self.enemy:
             if enemy.grid_pos == self.player.grid_pos:
                 self.remove_life()
+        if self.player.current_score == 276:
+            self.state = 'win'
     
     def playing_draw(self):
         self.screen.fill((8,23,84))
@@ -213,6 +219,28 @@ class App:
         quit_text = "Press the escape button to QUIT"
         again_text = "Press SPACE bar to PLAY AGAIN"
         self.draw_text([WIDTH//2,100],'GAME OVER',self.screen,50,COLOR_LIST[0],START_FONT,center = True)
+        self.draw_text([WIDTH//2,HEIGHT//2],quit_text,self.screen,START_TEXT_SIZE,COLOR_LIST[0],START_FONT,center = True)
+        self.draw_text([WIDTH//2,HEIGHT//1.5],again_text,self.screen,START_TEXT_SIZE,COLOR_LIST[0],START_FONT,center = True)
+        pygame.display.update()
+        
+    def win_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.reset()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                self.running = False
+
+    def win_update(self):
+        pass
+
+    def win_draw(self):
+        self.screen.fill((0,0,0))
+        quit_text = "Press the escape button to QUIT"
+        again_text = "Press SPACE bar to PLAY AGAIN"
+        self.draw_text([WIDTH//2,75],'CONGRAGULATION!',self.screen,45,COLOR_LIST[0],START_FONT,center = True)
+        self.draw_text([WIDTH//2,175],'YOU WIN!',self.screen,50,COLOR_LIST[0],START_FONT,center = True)
         self.draw_text([WIDTH//2,HEIGHT//2],quit_text,self.screen,START_TEXT_SIZE,COLOR_LIST[0],START_FONT,center = True)
         self.draw_text([WIDTH//2,HEIGHT//1.5],again_text,self.screen,START_TEXT_SIZE,COLOR_LIST[0],START_FONT,center = True)
         pygame.display.update()
