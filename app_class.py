@@ -178,7 +178,7 @@ class App:
         self.screen.fill((8,23,84))
         self.screen.blit(self.background, (TOP_BOTTOM_BF//2,TOP_BOTTOM_BF//2))
         self.draw_coin()
-        self.draw_grid()
+        ##self.draw_grid()
         self.draw_text([5,2],'SCORE:{}'.format(self.player.current_score),self.screen,START_TEXT_SIZE,(255,255,255),START_FONT)
         self.draw_text([WIDTH//2+50,2],'HIGHSCORE:{}'.format(self.player.highscore),self.screen,START_TEXT_SIZE,(255,255,255),START_FONT)
         self.draw_text([5,HEIGHT-20],'LIVES:',self.screen,START_TEXT_SIZE,(255,255,255),START_FONT)
